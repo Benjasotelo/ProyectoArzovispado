@@ -109,7 +109,12 @@ fun LoginScreen(
         Spacer(Modifier.height(8.dp))
 
         Button(
-            onClick = { onIngresar(viewModel.correo, viewModel.clave) },
+            onClick = {
+                viewModel.textoVisible = false
+                onIngresar(viewModel.correo, viewModel.clave)
+            val validador= viewModel.login()
+            if(validador){//navegar
+                 }else {viewModel.textoVisible = true}},
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Terracota, contentColor = Color.White),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
@@ -134,8 +139,13 @@ fun LoginScreen(
         ) {
             Text("Continuar como invitado", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
+        Spacer(Modifier.height(16.dp))
 
-        Spacer(Modifier.height(48.dp))
+        if (viewModel.textoVisible) {
+            Text("Credenciales invalidas", fontSize = 20.sp, color = TextoOscuro.copy(alpha = 0.8f))
+        }
+
+            Spacer(Modifier.height(48.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
