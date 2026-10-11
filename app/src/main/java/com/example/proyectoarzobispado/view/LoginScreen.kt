@@ -1,5 +1,7 @@
 package com.example.proyectoarzobispado.view
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectoarzobispado.viewmodel.LoginViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -34,8 +36,8 @@ fun LoginScreen(
     onIngresar: (String, String) -> Unit = { _, _ -> },
     onInvitado: () -> Unit = {}
 ) {
-    var correo by remember { mutableStateOf("") }
-    var clave by remember { mutableStateOf("") }
+
+    val viewModel: LoginViewModel = viewModel()
     var verClave by remember { mutableStateOf(false) }
 
     val coloresCampo = OutlinedTextFieldDefaults.colors(
@@ -68,8 +70,8 @@ fun LoginScreen(
         Spacer(Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = correo,
-            onValueChange = { correo = it },
+            value = viewModel.correo,
+            onValueChange = { viewModel.correo = it },
             label = { Text("Correo electrónico") },
             placeholder = { Text("nombre@correo.cl") },
             singleLine = true,
@@ -81,8 +83,8 @@ fun LoginScreen(
         )
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
-            value = clave,
-            onValueChange = { clave = it },
+            value = viewModel.clave,
+            onValueChange = { viewModel.clave = it },
             label = { Text("Contraseña") },
             singleLine = true,
             shape = RoundedCornerShape(16.dp),
@@ -107,7 +109,7 @@ fun LoginScreen(
         Spacer(Modifier.height(8.dp))
 
         Button(
-            onClick = { onIngresar(correo, clave) },
+            onClick = { onIngresar(viewModel.correo, viewModel.clave) },
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Terracota, contentColor = Color.White),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
