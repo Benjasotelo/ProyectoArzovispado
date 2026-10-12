@@ -7,6 +7,7 @@ object Routes {
     const val LOGIN = "login/{rol}"
     const val HOME = "home"
 
+    const val REGISTER = "register"
     // Pestañas del Home
     const val TAB_MAPA = "tab_mapa"
     const val TAB_RUTAS = "tab_rutas"

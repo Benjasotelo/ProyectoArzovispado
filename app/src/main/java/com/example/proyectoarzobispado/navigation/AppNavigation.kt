@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.proyectoarzobispado.view.HomeScreen
 import com.example.proyectoarzobispado.view.LoginScreen
+import com.example.proyectoarzobispado.view.RegistroScreen
 import com.example.proyectoarzobispado.view.WelcomeScreen
 
 @Composable
@@ -41,6 +42,9 @@ fun AppNavigation() {
                     }
                 }
             )
+        }
+        composable(Routes.REGISTER) {
+            RegistroScreen(navController = navController)
         }
 
         composable(Routes.HOME) {
