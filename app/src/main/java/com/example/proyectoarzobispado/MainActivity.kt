@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.example.proyectoarzobispado.navigation.AppNavigation
 import com.example.proyectoarzobispado.ui.theme.ProyectoArzobispadoTheme
 import com.example.proyectoarzobispado.view.LoginScreen
 import com.example.proyectoarzobispado.view.WelcomeScreen
@@ -17,14 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ProyectoArzobispadoTheme {
-                var rol by rememberSaveable { mutableStateOf<String?>(null) }
-
-                if (rol == null) {
-                    WelcomeScreen(onRolSeleccionado = { rol = it })
-                } else {
-                    BackHandler { rol = null }
-                    LoginScreen(rol = rol!!, onBack = { rol = null })
-                }
+                AppNavigation()
             }
         }
     }
