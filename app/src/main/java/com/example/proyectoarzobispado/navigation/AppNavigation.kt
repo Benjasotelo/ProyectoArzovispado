@@ -43,6 +43,14 @@ fun AppNavigation() {
             )
         }
 
-        composable(Routes.HOME) { HomeScreen() }
+        composable(Routes.HOME) {
+            HomeScreen(
+                onCerrarSesion = {
+                    navController.navigate(Routes.WELCOME) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
