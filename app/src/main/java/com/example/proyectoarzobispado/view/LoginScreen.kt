@@ -27,10 +27,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.proyectoarzobispado.navigation.Routes
 import com.example.proyectoarzobispado.ui.theme.*
 
 @Composable
 fun LoginScreen(
+    navController: NavController,
     rol: String = "Turista",
     onBack: () -> Unit = {},
     onIngresar: (String, String) -> Unit = { _, _ -> },
@@ -113,7 +116,7 @@ fun LoginScreen(
                 viewModel.textoVisible = false
                 onIngresar(viewModel.correo, viewModel.clave)
             val validador= viewModel.login()
-            if(validador){//navegar
+            if(validador){navController.navigate(Routes.HOME)
                  }else {viewModel.textoVisible = true}},
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Terracota, contentColor = Color.White),

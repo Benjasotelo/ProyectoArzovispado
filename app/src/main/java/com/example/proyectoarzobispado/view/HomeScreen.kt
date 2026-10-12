@@ -15,7 +15,7 @@ fun HomeScreen(){
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(text = "Hola Mundo")
+        Text(text = "Bienvenido")
     }
 
 
