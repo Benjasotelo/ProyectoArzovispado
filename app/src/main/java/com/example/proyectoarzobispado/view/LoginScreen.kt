@@ -148,6 +148,10 @@ fun LoginScreen(
             Text("Credenciales invalidas", fontSize = 20.sp, color = TextoOscuro.copy(alpha = 0.8f))
         }
 
+        Text(text = "¿No tienes una cuenta? ", fontSize = 16.sp, color = TextoOscuro.copy(alpha = 0.6f), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        TextButton(onClick = { navController.navigate(Routes.REGISTER) }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Text("Regístrate", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Terracota)
+        }
             Spacer(Modifier.height(48.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
