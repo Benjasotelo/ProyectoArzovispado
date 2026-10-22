@@ -1,60 +1,58 @@
 package com.example.proyectoarzobispado.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.example.proyectoarzobispado.data.Repositorio
 import com.example.proyectoarzobispado.view.HomeScreen
 import com.example.proyectoarzobispado.view.LoginScreen
 import com.example.proyectoarzobispado.view.RegistroScreen
-import com.example.proyectoarzobispado.view.WelcomeScreen
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val repo = Repositorio.obtener(LocalContext.current)
+    val inicio = remember { if (repo.haySesion()) Routes.HOME else Routes.LOGIN }
 
-    NavHost(
-        navController = navController,
-        startDestination = Routes.WELCOME
-    ) {
-        composable(Routes.WELCOME) {
-            WelcomeScreen(
-                onRolSeleccionado = { rol ->
-                    navController.navigate(Routes.login(rol))
-                }
-            )
-        }
+    NavHost(navController = navController, startDestination = inicio) {
 
-        composable(
-            route = Routes.LOGIN,
-            arguments = listOf(navArgument("rol") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val rol = backStackEntry.arguments?.getString("rol") ?: ""
+        composable(Routes.LOGIN) {
             LoginScreen(
                 navController = navController,
-                rol = rol,
-                onBack = { navController.popBackStack() },
+                onLoginExitoso = { irAlHome(navController) },
                 onInvitado = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.WELCOME) { inclusive = true }
-                    }
+                    repo.cerrarSesion()
+                    irAlHome(navController)
                 }
             )
         }
+
         composable(Routes.REGISTER) {
-            RegistroScreen(navController = navController)
+            RegistroScreen(
+                navController = navController,
+                onRegistroExitoso = { irAlHome(navController) }
+            )
         }
 
         composable(Routes.HOME) {
             HomeScreen(
                 onCerrarSesion = {
-                    navController.navigate(Routes.WELCOME) {
+                    navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.HOME) { inclusive = true }
                     }
                 }
             )
         }
+    }
+}
+
+// Va al Home y borra login/registro del historial (el botón "atrás" no vuelve a ellos)
+private fun irAlHome(navController: NavController) {
+    navController.navigate(Routes.HOME) {
+        popUpTo(navController.graph.id) { inclusive = true }
     }
 }

@@ -51,6 +51,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.Person
 
 // ---------- Utilidades ----------
 
@@ -176,7 +177,7 @@ fun MapaScreen(onPerfil: () -> Unit, vm: HomeViewModel = viewModel()) {
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Buscador(onPerfil)
+            Buscador(vm.iniciales, onPerfil)
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -195,6 +196,7 @@ fun MapaScreen(onPerfil: () -> Unit, vm: HomeViewModel = viewModel()) {
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(start = 16.dp, end = 16.dp, bottom = 100.dp),
             horizontalAlignment = Alignment.End,
@@ -232,7 +234,7 @@ fun MapaScreen(onPerfil: () -> Unit, vm: HomeViewModel = viewModel()) {
 }
 
 @Composable
-private fun Buscador(onPerfil: () -> Unit) {
+private fun Buscador(iniciales: String, onPerfil: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = CircleShape,
@@ -259,7 +261,11 @@ private fun Buscador(onPerfil: () -> Unit) {
                     .clickable(onClick = onPerfil),
                 contentAlignment = Alignment.Center
             ) {
-                Text("JP", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Terracota)
+                if (iniciales.isNotEmpty()) {
+                    Text(iniciales, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Terracota)
+                } else {
+                    Icon(Icons.Filled.Person, contentDescription = "Perfil", tint = Terracota)
+                }
             }
         }
     }

@@ -30,13 +30,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectoarzobispado.navigation.Routes
 import com.example.proyectoarzobispado.ui.theme.*
+import androidx.compose.material.icons.filled.ErrorOutline
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    rol: String = "Turista",
-    onBack: () -> Unit = {},
-    onIngresar: (String, String) -> Unit = { _, _ -> },
+    onLoginExitoso: () -> Unit = {},
     onInvitado: () -> Unit = {}
 ) {
 
@@ -50,7 +49,11 @@ fun LoginScreen(
         unfocusedLabelColor = Terracota.copy(alpha = 0.8f),
         cursorColor = Terracota,
         focusedTextColor = TextoOscuro,
-        unfocusedTextColor = TextoOscuro
+        unfocusedTextColor = TextoOscuro,
+        errorBorderColor = Color(0xFF8A2A22),
+        errorLabelColor = Color(0xFF8A2A22),
+        errorTextColor = TextoOscuro,
+        errorCursorColor = Color(0xFF8A2A22)
     )
 
     Column(
@@ -61,20 +64,18 @@ fun LoginScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
-        IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = TextoOscuro)
-        }
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(48.dp))
         LogoApp(56.dp)
         Spacer(Modifier.height(24.dp))
         Text("Bienvenido", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = TextoOscuro)
         Spacer(Modifier.height(4.dp))
-        Text("Ingresa como $rol", fontSize = 16.sp, color = TextoOscuro.copy(alpha = 0.8f))
+        Text("Ingresa a tu cuenta", fontSize = 16.sp, color = TextoOscuro.copy(alpha = 0.8f))
         Spacer(Modifier.height(32.dp))
 
         OutlinedTextField(
             value = viewModel.correo,
-            onValueChange = { viewModel.correo = it },
+            onValueChange = { viewModel.correo = it; viewModel.textoVisible = false },
+            isError = viewModel.textoVisible,
             label = { Text("Correo electrónico") },
             placeholder = { Text("nombre@correo.cl") },
             singleLine = true,
@@ -87,7 +88,8 @@ fun LoginScreen(
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             value = viewModel.clave,
-            onValueChange = { viewModel.clave = it },
+            onValueChange = { viewModel.clave = it; viewModel.textoVisible = false },
+            isError = viewModel.textoVisible,
             label = { Text("Contraseña") },
             singleLine = true,
             shape = RoundedCornerShape(16.dp),
@@ -111,13 +113,36 @@ fun LoginScreen(
         }
         Spacer(Modifier.height(8.dp))
 
+        if (viewModel.textoVisible) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF6D3CF), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    Icons.Filled.ErrorOutline,
+                    contentDescription = null,
+                    tint = Color(0xFF8A2A22),
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    "Correo o contraseña incorrectos",
+                    fontSize = 14.sp,
+                    color = Color(0xFF8A2A22)
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+        }
+
         Button(
             onClick = {
                 viewModel.textoVisible = false
-                onIngresar(viewModel.correo, viewModel.clave)
-            val validador= viewModel.login()
-            if(validador){navController.navigate(Routes.HOME)
-                 }else {viewModel.textoVisible = true}},
+                viewModel.login(onExito = onLoginExitoso)
+            },
+            enabled = !viewModel.cargando,
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Terracota, contentColor = Color.White),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
@@ -143,10 +168,6 @@ fun LoginScreen(
             Text("Continuar como invitado", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
         Spacer(Modifier.height(16.dp))
-
-        if (viewModel.textoVisible) {
-            Text("Credenciales invalidas", fontSize = 20.sp, color = TextoOscuro.copy(alpha = 0.8f))
-        }
 
         Text(text = "¿No tienes una cuenta? ", fontSize = 16.sp, color = TextoOscuro.copy(alpha = 0.6f), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         TextButton(onClick = { navController.navigate(Routes.REGISTER) }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
