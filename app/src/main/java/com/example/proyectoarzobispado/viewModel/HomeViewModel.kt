@@ -10,6 +10,12 @@ import com.example.proyectoarzobispado.data.Repositorio
 import com.example.proyectoarzobispado.model.EstadoRecinto
 import com.example.proyectoarzobispado.model.Recinto
 import kotlinx.coroutines.launch
+import java.text.Normalizer
+
+// Pasa a minúsculas y quita tildes: "Basílica" -> "basilica"
+private fun normalizar(texto: String): String =
+    Normalizer.normalize(texto.lowercase(), Normalizer.Form.NFD)
+        .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
 
 class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = Repositorio.obtener(app)
@@ -22,9 +28,28 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var iniciales by mutableStateOf("")
         private set
+    var consulta by mutableStateOf("")
+        private set
 
     val recintosFiltrados: List<Recinto>
         get() = filtroEstado?.let { f -> recintos.filter { it.estado == f } } ?: recintos
+
+    // Recintos que coinciden con lo escrito. Todas las palabras deben aparecer.
+    val resultados: List<Recinto>
+        get() {
+            val palabras = normalizar(consulta).split(" ").filter { it.isNotBlank() }
+            if (palabras.isEmpty()) return emptyList()
+            return recintos
+                .filter { r ->
+                    val texto = normalizar("${r.nombreOficial} ${r.direccion} ${r.tipoRecinto}")
+                    palabras.all { texto.contains(it) }
+                }
+                // primero los que coinciden por nombre
+                .sortedBy { r ->
+                    val nombre = normalizar(r.nombreOficial)
+                    if (palabras.all { nombre.contains(it) }) 0 else 1
+                }
+        }
 
     init {
         viewModelScope.launch {
@@ -45,4 +70,14 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     fun seleccionarRecinto(recinto: Recinto) { recintoSeleccionado = recinto }
 
     fun cerrarFicha() { recintoSeleccionado = null }
+
+    fun actualizarConsulta(texto: String) { consulta = texto }
+
+    // Al elegir un resultado: limpia la búsqueda y deja el recinto seleccionado en el mapa.
+    // Si un filtro de estado lo ocultaría, lo quita.
+    fun elegirResultado(recinto: Recinto) {
+        consulta = ""
+        if (filtroEstado != null && recinto.estado != filtroEstado) filtroEstado = null
+        recintoSeleccionado = recinto
+    }
 }

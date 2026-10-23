@@ -1,5 +1,13 @@
 package com.example.proyectoarzobispado.view
 
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -92,6 +100,7 @@ private fun distanciaMetros(desde: LatLng, recinto: Recinto): Float {
 @Composable
 fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, vm: HomeViewModel = viewModel()) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val recinto = vm.recintoSeleccionado
 
@@ -170,28 +179,43 @@ fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, vm: HomeViewMo
             }
         }
 
-        // Buscador + filtros
+        // Buscador + filtros (o resultados mientras se escribe)
         Column(
             modifier = Modifier
                 .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Buscador(vm.iniciales, onPerfil)
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                EstadoRecinto.entries.forEach { estado ->
-                    ChipEstado(
-                        estado = estado,
-                        seleccionado = vm.filtroEstado == estado,
-                        onClick = { vm.seleccionarFiltro(estado) }
-                    )
+            Buscador(
+                consulta = vm.consulta,
+                onConsultaChange = { vm.actualizarConsulta(it) },
+                iniciales = vm.iniciales,
+                onPerfil = onPerfil
+            )
+            if (vm.consulta.isNotBlank()) {
+                ResultadosBusqueda(
+                    resultados = vm.resultados,
+                    onElegir = { r ->
+                        focusManager.clearFocus()
+                        vm.elegirResultado(r)
+                        onAbrirFicha(r.id)
+                    }
+                )
+            } else {
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    EstadoRecinto.entries.forEach { estado ->
+                        ChipEstado(
+                            estado = estado,
+                            seleccionado = vm.filtroEstado == estado,
+                            onClick = { vm.seleccionarFiltro(estado) }
+                        )
+                    }
                 }
             }
         }
-
         // Botón de ubicación + tarjeta del templo
         Column(
             modifier = Modifier
@@ -234,7 +258,14 @@ fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, vm: HomeViewMo
 }
 
 @Composable
-private fun Buscador(iniciales: String, onPerfil: () -> Unit) {
+private fun Buscador(
+    consulta: String,
+    onConsultaChange: (String) -> Unit,
+    iniciales: String,
+    onPerfil: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = CircleShape,
@@ -248,11 +279,37 @@ private fun Buscador(iniciales: String, onPerfil: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(Icons.Filled.Search, null, tint = TextoOscuro.copy(alpha = 0.7f))
-            Text(
-                "Buscar templos o barrios",
+            Box(
                 modifier = Modifier.weight(1f),
-                color = TextoOscuro.copy(alpha = 0.6f)
-            )
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (consulta.isEmpty()) {
+                    Text("Buscar templos o barrios", color = TextoOscuro.copy(alpha = 0.6f))
+                }
+                BasicTextField(
+                    value = consulta,
+                    onValueChange = onConsultaChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    textStyle = TextStyle(color = TextoOscuro, fontSize = 16.sp),
+                    cursorBrush = SolidColor(Terracota),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
+                )
+            }
+            if (consulta.isNotEmpty()) {
+                IconButton(
+                    onClick = { onConsultaChange("") },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = "Borrar búsqueda",
+                        tint = TextoOscuro.copy(alpha = 0.7f),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -271,6 +328,51 @@ private fun Buscador(iniciales: String, onPerfil: () -> Unit) {
     }
 }
 
+@Composable
+private fun ResultadosBusqueda(resultados: List<Recinto>, onElegir: (Recinto) -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = Color.White,
+        shadowElevation = 4.dp,
+        border = BorderStroke(1.dp, BordeSuave)
+    ) {
+        if (resultados.isEmpty()) {
+            Text(
+                "Sin resultados",
+                modifier = Modifier.padding(16.dp),
+                color = TextoOscuro.copy(alpha = 0.7f)
+            )
+        } else {
+            Column {
+                resultados.forEachIndexed { indice, r ->
+                    if (indice > 0) HorizontalDivider(color = BordeSuave)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onElegir(r) }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(r.nombreOficial, fontWeight = FontWeight.Medium, color = TextoOscuro)
+                            Text(
+                                r.direccion,
+                                fontSize = 13.sp,
+                                color = TextoOscuro.copy(alpha = 0.7f)
+                            )
+                        }
+                        EstadoTag(r.estado)
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable
 internal fun ChipEstado(estado: EstadoRecinto, seleccionado: Boolean, onClick: () -> Unit) {
     val (fondo, texto) = coloresEstado(estado)
