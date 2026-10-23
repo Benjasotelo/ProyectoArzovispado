@@ -79,7 +79,8 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
             composable(Routes.TAB_MAPA) {
                 MapaScreen(
                     onPerfil = { irA(Routes.TAB_PERFIL) },
-                    onAbrirFicha = { id -> tabNav.navigate(Routes.ficha(id)) }
+                    onAbrirFicha = { id -> tabNav.navigate(Routes.ficha(id)) },
+                    onEscanear = { tabNav.navigate(Routes.ESCANER) }
                 )
             }
             composable(
@@ -92,11 +93,22 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
             composable(Routes.TAB_AVISOS) { PlaceholderTab("Avisos") }
             composable(Routes.TAB_MI_RECINTO) { MiRecintoScreen() }
             composable(Routes.TAB_PERFIL) { PerfilScreen(onCerrarSesion) }
+            composable(Routes.ESCANER) {
+                EscanerScreen(
+                    onVolver = { tabNav.popBackStack() },
+                    onRecintoEncontrado = { id ->
+                        // Abre la ficha y saca el escáner del historial: "atrás" vuelve al mapa
+                        tabNav.navigate(Routes.ficha(id)) {
+                            popUpTo(Routes.ESCANER) { inclusive = true }
+                        }
+                    }
+                )
+            }
         }
 
         BarraFlotante(
             tabs = tabs,
-            rutaActual = if (rutaActual == Routes.FICHA) Routes.TAB_MAPA else rutaActual,
+            rutaActual = if (rutaActual == Routes.FICHA || rutaActual == Routes.ESCANER) Routes.TAB_MAPA else rutaActual,
             onTabClick = irA,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
