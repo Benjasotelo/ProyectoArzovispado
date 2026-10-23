@@ -52,6 +52,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.Person
+import com.example.proyectoarzobispado.R
+import com.example.proyectoarzobispado.ui.theme.LocalModoOscuro
+import com.example.proyectoarzobispado.ui.theme.Superficie
+import com.google.android.gms.maps.model.MapStyleOptions
 
 // ---------- Utilidades ----------
 
@@ -59,10 +63,17 @@ private fun tienePermiso(context: Context): Boolean =
     ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-private fun coloresEstado(estado: EstadoRecinto): Pair<Color, Color> = when (estado) {
-    EstadoRecinto.ABIERTO -> Color(0xFFCFEFD6) to Color(0xFF1E5E34)
-    EstadoRecinto.CERRADO -> Color(0xFFF6D3CF) to Color(0xFF8A2A22)
-    EstadoRecinto.EN_CELEBRACION -> Color(0xFFFBE7B8) to Color(0xFF7A5200)
+@Composable
+private fun coloresEstado(estado: EstadoRecinto): Pair<Color, Color> {
+    val oscuro = LocalModoOscuro.current
+    return when (estado) {
+        EstadoRecinto.ABIERTO ->
+            if (oscuro) Color(0xFF1F4D2E) to Color(0xFFA8E0B8) else Color(0xFFCFEFD6) to Color(0xFF1E5E34)
+        EstadoRecinto.CERRADO ->
+            if (oscuro) Color(0xFF5A2420) to Color(0xFFF2B8B0) else Color(0xFFF6D3CF) to Color(0xFF8A2A22)
+        EstadoRecinto.EN_CELEBRACION ->
+            if (oscuro) Color(0xFF5A4310) to Color(0xFFF5D98A) else Color(0xFFFBE7B8) to Color(0xFF7A5200)
+    }
 }
 
 private fun hueDe(estado: EstadoRecinto): Float = when (estado) {
@@ -150,7 +161,12 @@ fun MapaScreen(onPerfil: () -> Unit, vm: HomeViewModel = viewModel()) {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             contentPadding = PaddingValues(bottom = 110.dp),
-            properties = MapProperties(isMyLocationEnabled = permiso),
+            properties = MapProperties(
+                isMyLocationEnabled = permiso,
+                mapStyleOptions = if (LocalModoOscuro.current)
+                    MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style_dark)
+                else null
+            ),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = false,
                 myLocationButtonEnabled = false,
@@ -238,7 +254,7 @@ private fun Buscador(iniciales: String, onPerfil: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = CircleShape,
-        color = Color.White,
+        color = Superficie,
         shadowElevation = 4.dp,
         border = BorderStroke(1.dp, BordeSuave)
     ) {
@@ -277,7 +293,7 @@ private fun ChipEstado(estado: EstadoRecinto, seleccionado: Boolean, onClick: ()
     Row(
         modifier = Modifier
             .clip(CircleShape)
-            .background(if (seleccionado) fondo else Color.White)
+            .background(if (seleccionado) fondo else Superficie)
             .border(1.dp, if (seleccionado) fondo else BordeSuave, CircleShape)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 8.dp),
@@ -318,7 +334,7 @@ private fun TarjetaRecinto(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
+        color = Superficie,
         shadowElevation = 6.dp,
         border = BorderStroke(1.dp, BordeSuave)
     ) {

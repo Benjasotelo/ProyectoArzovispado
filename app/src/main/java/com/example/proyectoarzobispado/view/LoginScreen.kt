@@ -50,10 +50,10 @@ fun LoginScreen(
         cursorColor = Terracota,
         focusedTextColor = TextoOscuro,
         unfocusedTextColor = TextoOscuro,
-        errorBorderColor = Color(0xFF8A2A22),
-        errorLabelColor = Color(0xFF8A2A22),
+        errorBorderColor = ErrorTexto,
+        errorLabelColor = ErrorTexto,
         errorTextColor = TextoOscuro,
-        errorCursorColor = Color(0xFF8A2A22)
+        errorCursorColor = ErrorTexto
     )
 
     Column(
@@ -117,7 +117,7 @@ fun LoginScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF6D3CF), RoundedCornerShape(12.dp))
+                    .background(ErrorFondo, RoundedCornerShape(size = 12.dp))
                     .padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -125,13 +125,13 @@ fun LoginScreen(
                 Icon(
                     Icons.Filled.ErrorOutline,
                     contentDescription = null,
-                    tint = Color(0xFF8A2A22),
+                    tint = ErrorTexto,
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
                     "Correo o contraseña incorrectos",
                     fontSize = 14.sp,
-                    color = Color(0xFF8A2A22)
+                    color = ErrorTexto
                 )
             }
             Spacer(Modifier.height(12.dp))
@@ -144,7 +144,7 @@ fun LoginScreen(
             },
             enabled = !viewModel.cargando,
             shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Terracota, contentColor = Color.White),
+            colors = ButtonDefaults.buttonColors(containerColor = Terracota, contentColor = SobreTerracota),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
             modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {

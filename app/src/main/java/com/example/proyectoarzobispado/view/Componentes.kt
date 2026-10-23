@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.proyectoarzobispado.ui.theme.SobreTerracota
 import com.example.proyectoarzobispado.ui.theme.Terracota
 
 @Composable
@@ -28,7 +29,7 @@ fun LogoApp(size: Dp = 72.dp) {
         Icon(
             imageVector = Icons.Filled.AccountBalance,
             contentDescription = null,
-            tint = Color.White,
+            tint = SobreTerracota,
             modifier = Modifier.size(size * 0.5f)
         )
     }

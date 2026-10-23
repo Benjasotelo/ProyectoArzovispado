@@ -28,12 +28,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.proyectoarzobispado.viewmodel.RegistroViewModel
+import com.example.proyectoarzobispado.ui.theme.*
 
 // Definición de colores basados en el diseño
-val TerracottaPrimary = Color(0xFF8C4A38)
-val TerracottaLight = Color(0xFFFCEAE3)
-val BackgroundBeige = Color(0xFFF9F6F0)
-val TextDark = Color(0xFF1F1A1C)
+val Terracota = Color(0xFF8C4A38)
+
+val TextoOscuro = Color(0xFF1F1A1C)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +47,7 @@ fun RegistroScreen(
         if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = Crema,
         topBar = {
             IconButton(
                 onClick = { navController.popBackStack() },
@@ -56,7 +56,7 @@ fun RegistroScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Volver",
-                    tint = TextDark
+                    tint = TextoOscuro
                 )
             }
         }
@@ -74,13 +74,13 @@ fun RegistroScreen(
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(color = TerracottaPrimary, shape = RoundedCornerShape(16.dp)),
+                    .background(color = Terracota, shape = RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.AccountBalance,
                     contentDescription = "Logo",
-                    tint = Color.White,
+                    tint = SobreTerracota,
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -91,13 +91,13 @@ fun RegistroScreen(
                 text = "Crear Cuenta",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextDark,
+                color = TextoOscuro,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
                 text = "Regístrate como Turista",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = TextoOscuro.copy(alpha = 0.6f),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, bottom = 24.dp)
@@ -108,7 +108,7 @@ fun RegistroScreen(
                 onCambio = { vm.nombre = it },
                 etiqueta = "Nombre completo",
                 placeholder = "Ej. Juan Pérez",
-                icono = { Icon(Icons.Default.Person, null, tint = Color.Gray) }
+                icono = { Icon(Icons.Default.Person, null, tint = TextoOscuro.copy(alpha = 0.6f)) }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -117,7 +117,7 @@ fun RegistroScreen(
                 onCambio = { vm.correo = it },
                 etiqueta = "Correo electrónico",
                 placeholder = "nombre@correo.cl",
-                icono = { Icon(Icons.Default.Email, null, tint = Color.Gray) },
+                icono = { Icon(Icons.Default.Email, null, tint = TextoOscuro.copy(alpha = 0.6f)) },
                 teclado = KeyboardType.Email
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,7 +134,7 @@ fun RegistroScreen(
                         Icon(
                             imageVector = if (passwordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
                             contentDescription = "Mostrar u ocultar contraseña",
-                            tint = Color.Gray
+                            tint = TextoOscuro.copy(alpha = 0.6f)
                         )
                     }
                 }
@@ -148,7 +148,7 @@ fun RegistroScreen(
                 placeholder = "••••••••",
                 transformacion = transformacionClave,
                 teclado = KeyboardType.Password,
-                icono = { Icon(Icons.Default.Lock, null, tint = Color.Gray) }
+                icono = { Icon(Icons.Default.Lock, null, tint = TextoOscuro.copy(alpha = 0.6f)) }
             )
 
             vm.error?.let { mensaje ->
@@ -167,7 +167,7 @@ fun RegistroScreen(
                 onClick = { vm.registrar(onExito = onRegistroExitoso) },
                 enabled = !vm.cargando,
                 shape = RoundedCornerShape(24.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = Terracota),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -176,14 +176,14 @@ fun RegistroScreen(
                     text = "Registrarse",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = SobreTerracota
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "¿Ya tienes una cuenta?", color = Color.Black, fontSize = 14.sp)
+            Text(text = "¿Ya tienes una cuenta?", color = TextoOscuro, fontSize = 14.sp)
             TextButton(onClick = { navController.popBackStack() }) {
-                Text(text = "Inicia sesión", color = TerracottaPrimary, fontSize = 14.sp)
+                Text(text = "Inicia sesión", color = Terracota, fontSize = 14.sp)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -212,8 +212,8 @@ private fun CampoRegistro(
         keyboardOptions = KeyboardOptions(keyboardType = teclado),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = TerracottaPrimary,
-            focusedLabelColor = TerracottaPrimary
+            focusedBorderColor = Terracota,
+            focusedLabelColor = Terracota
         ),
         modifier = Modifier.fillMaxWidth()
     )

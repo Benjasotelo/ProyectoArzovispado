@@ -32,6 +32,7 @@ import com.example.proyectoarzobispado.navigation.Routes
 import com.example.proyectoarzobispado.ui.theme.BordeSuave
 import com.example.proyectoarzobispado.ui.theme.Crema
 import com.example.proyectoarzobispado.ui.theme.Durazno
+import com.example.proyectoarzobispado.ui.theme.Superficie
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
 
@@ -90,7 +91,7 @@ private fun BarraFlotante(
             .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         shape = RoundedCornerShape(32.dp),
-        color = Color.White.copy(alpha = 0.94f),
+        color = Superficie.copy(alpha = 0.94f),
         shadowElevation = 10.dp,
         border = BorderStroke(0.5.dp, BordeSuave)
     ) {
