@@ -20,6 +20,8 @@ class Repositorio private constructor(context: Context) {
     suspend fun actualizarEstado(idRecinto: Int, estado: EstadoRecinto) {
         db.recintoDao().actualizarEstado(idRecinto, estado.name)
     }
+    fun recinto(id: Int): Flow<Recinto?> =
+        recintos.map { lista -> lista.find { it.id == id } }
 
     // ---------- Datos iniciales (se ejecuta al abrir la app) ----------
     suspend fun sembrarDatosIniciales() {

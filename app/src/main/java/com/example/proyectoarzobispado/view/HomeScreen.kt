@@ -1,5 +1,7 @@
 package com.example.proyectoarzobispado.view
 
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,7 +76,18 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
             startDestination = Routes.TAB_MAPA,
             modifier = Modifier.fillMaxSize()
         ) {
-            composable(Routes.TAB_MAPA) { MapaScreen(onPerfil = { irA(Routes.TAB_PERFIL) }) }
+            composable(Routes.TAB_MAPA) {
+                MapaScreen(
+                    onPerfil = { irA(Routes.TAB_PERFIL) },
+                    onAbrirFicha = { id -> tabNav.navigate(Routes.ficha(id)) }
+                )
+            }
+            composable(
+                route = Routes.FICHA,
+                arguments = listOf(navArgument("recintoId") { type = NavType.IntType })
+            ) {
+                FichaScreen(onVolver = { tabNav.popBackStack() })
+            }
             composable(Routes.TAB_RUTAS) { PlaceholderTab("Rutas patrimoniales") }
             composable(Routes.TAB_AVISOS) { PlaceholderTab("Avisos") }
             composable(Routes.TAB_MI_RECINTO) { MiRecintoScreen() }
@@ -83,7 +96,7 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
 
         BarraFlotante(
             tabs = tabs,
-            rutaActual = rutaActual,
+            rutaActual = if (rutaActual == Routes.FICHA) Routes.TAB_MAPA else rutaActual,
             onTabClick = irA,
             modifier = Modifier.align(Alignment.BottomCenter)
         )

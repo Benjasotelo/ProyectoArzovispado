@@ -90,7 +90,7 @@ private fun distanciaMetros(desde: LatLng, recinto: Recinto): Float {
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MapaScreen(onPerfil: () -> Unit, vm: HomeViewModel = viewModel()) {
+fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, vm: HomeViewModel = viewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val recinto = vm.recintoSeleccionado
@@ -226,7 +226,7 @@ fun MapaScreen(onPerfil: () -> Unit, vm: HomeViewModel = viewModel()) {
                 TarjetaRecinto(
                     recinto = r,
                     textoDistancia = ubicacion?.let { textoDistancia(distanciaMetros(it, r)) },
-                    onVerFicha = { /* TODO: navegar a la ficha patrimonial */ }
+                    onVerFicha = { onAbrirFicha(r.id)  }
                 )
             }
         }

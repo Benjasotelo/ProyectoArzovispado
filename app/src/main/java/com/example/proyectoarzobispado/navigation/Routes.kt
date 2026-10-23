@@ -11,4 +11,8 @@ object Routes {
     const val TAB_AVISOS = "tab_avisos"
     const val TAB_MI_RECINTO = "tab_mi_recinto"
     const val TAB_PERFIL = "tab_perfil"
+
+    // Ficha patrimonial: {recintoId} es un parámetro que se rellena al navegar
+    const val FICHA = "ficha/{recintoId}"
+    fun ficha(recintoId: Int) = "ficha/$recintoId"
 }
