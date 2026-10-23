@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectoarzobispado.ui.theme.BordeSuave
 import com.example.proyectoarzobispado.ui.theme.Durazno
+import com.example.proyectoarzobispado.ui.theme.Superficie
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
 import com.example.proyectoarzobispado.viewmodel.PerfilViewModel
@@ -39,7 +40,7 @@ fun PerfilScreen(onCerrarSesion: () -> Unit, vm: PerfilViewModel = viewModel()) 
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = Superficie),
             border = BorderStroke(1.dp, BordeSuave)
         ) {
             Row(
