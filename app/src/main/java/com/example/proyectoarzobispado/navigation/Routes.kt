@@ -9,5 +9,6 @@ object Routes {
     const val TAB_MAPA = "tab_mapa"
     const val TAB_RUTAS = "tab_rutas"
     const val TAB_AVISOS = "tab_avisos"
+    const val TAB_MI_RECINTO = "tab_mi_recinto"
     const val TAB_PERFIL = "tab_perfil"
 }

@@ -59,7 +59,7 @@ private fun tienePermiso(context: Context): Boolean =
     ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-private fun coloresEstado(estado: EstadoRecinto): Pair<Color, Color> = when (estado) {
+internal fun coloresEstado(estado: EstadoRecinto): Pair<Color, Color> = when (estado) {
     EstadoRecinto.ABIERTO -> Color(0xFFCFEFD6) to Color(0xFF1E5E34)
     EstadoRecinto.CERRADO -> Color(0xFFF6D3CF) to Color(0xFF8A2A22)
     EstadoRecinto.EN_CELEBRACION -> Color(0xFFFBE7B8) to Color(0xFF7A5200)
@@ -272,7 +272,7 @@ private fun Buscador(iniciales: String, onPerfil: () -> Unit) {
 }
 
 @Composable
-private fun ChipEstado(estado: EstadoRecinto, seleccionado: Boolean, onClick: () -> Unit) {
+internal fun ChipEstado(estado: EstadoRecinto, seleccionado: Boolean, onClick: () -> Unit) {
     val (fondo, texto) = coloresEstado(estado)
     Row(
         modifier = Modifier
@@ -294,7 +294,7 @@ private fun ChipEstado(estado: EstadoRecinto, seleccionado: Boolean, onClick: ()
 }
 
 @Composable
-private fun EstadoTag(estado: EstadoRecinto) {
+internal fun EstadoTag(estado: EstadoRecinto) {
     val (fondo, texto) = coloresEstado(estado)
     Row(
         modifier = Modifier

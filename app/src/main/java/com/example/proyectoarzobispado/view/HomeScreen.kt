@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -23,32 +24,41 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectoarzobispado.model.Rol
 import com.example.proyectoarzobispado.navigation.Routes
 import com.example.proyectoarzobispado.ui.theme.BordeSuave
 import com.example.proyectoarzobispado.ui.theme.Crema
 import com.example.proyectoarzobispado.ui.theme.Durazno
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
+import com.example.proyectoarzobispado.viewmodel.PerfilViewModel
 
 private data class TabItem(val route: String, val label: String, val icon: ImageVector)
 
-private val tabs = listOf(
-    TabItem(Routes.TAB_MAPA, "Mapa", Icons.Filled.Map),
-    TabItem(Routes.TAB_RUTAS, "Rutas", Icons.Filled.Route),
-    TabItem(Routes.TAB_AVISOS, "Avisos", Icons.Filled.Notifications),
-    TabItem(Routes.TAB_PERFIL, "Perfil", Icons.Filled.Person)
-)
+// Las pestañas dependen del rol. null = invitado (sin sesión) o usuario aún cargando.
+private fun pestanasPara(rol: Rol?): List<TabItem> = buildList {
+    add(TabItem(Routes.TAB_MAPA, "Mapa", Icons.Filled.Map))
+    add(TabItem(Routes.TAB_RUTAS, "Rutas", Icons.Filled.Route))
+    add(TabItem(Routes.TAB_AVISOS, "Avisos", Icons.Filled.Notifications))
+    if (rol == Rol.ENCARGADO) {
+        add(TabItem(Routes.TAB_MI_RECINTO, "Mi recinto", Icons.Filled.AccountBalance))
+    }
+    add(TabItem(Routes.TAB_PERFIL, "Perfil", Icons.Filled.Person))
+}
 
 @Composable
-fun HomeScreen(onCerrarSesion: () -> Unit) {
+fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel()) {
     val tabNav = rememberNavController()
     val backStack by tabNav.currentBackStackEntryAsState()
     val rutaActual = backStack?.destination?.route
+
+    val tabs = pestanasPara(sesionVm.usuario?.rol)
 
     val irA: (String) -> Unit = { ruta ->
         tabNav.navigate(ruta) {
@@ -67,10 +77,12 @@ fun HomeScreen(onCerrarSesion: () -> Unit) {
             composable(Routes.TAB_MAPA) { MapaScreen(onPerfil = { irA(Routes.TAB_PERFIL) }) }
             composable(Routes.TAB_RUTAS) { PlaceholderTab("Rutas patrimoniales") }
             composable(Routes.TAB_AVISOS) { PlaceholderTab("Avisos") }
+            composable(Routes.TAB_MI_RECINTO) { MiRecintoScreen() }
             composable(Routes.TAB_PERFIL) { PerfilScreen(onCerrarSesion) }
         }
 
         BarraFlotante(
+            tabs = tabs,
             rutaActual = rutaActual,
             onTabClick = irA,
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -80,6 +92,7 @@ fun HomeScreen(onCerrarSesion: () -> Unit) {
 
 @Composable
 private fun BarraFlotante(
+    tabs: List<TabItem>,
     rutaActual: String?,
     onTabClick: (String) -> Unit,
     modifier: Modifier = Modifier

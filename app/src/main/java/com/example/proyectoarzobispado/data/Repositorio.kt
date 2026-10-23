@@ -1,6 +1,7 @@
 package com.example.proyectoarzobispado.data
 
 import android.content.Context
+import com.example.proyectoarzobispado.model.EstadoRecinto
 import com.example.proyectoarzobispado.model.Recinto
 import com.example.proyectoarzobispado.model.RecintosEjemplo
 import com.example.proyectoarzobispado.model.Rol
@@ -16,6 +17,9 @@ class Repositorio private constructor(context: Context) {
     // ---------- Recintos ----------
     val recintos: Flow<List<Recinto>> =
         db.recintoDao().observarTodos().map { lista -> lista.map { it.aModelo() } }
+    suspend fun actualizarEstado(idRecinto: Int, estado: EstadoRecinto) {
+        db.recintoDao().actualizarEstado(idRecinto, estado.name)
+    }
 
     // ---------- Datos iniciales (se ejecuta al abrir la app) ----------
     suspend fun sembrarDatosIniciales() {
