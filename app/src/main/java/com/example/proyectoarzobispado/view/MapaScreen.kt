@@ -60,6 +60,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCodeScanner
 
 // ---------- Utilidades ----------
 
@@ -98,7 +99,7 @@ private fun distanciaMetros(desde: LatLng, recinto: Recinto): Float {
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, vm: HomeViewModel = viewModel()) {
+fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, onEscanear: () -> Unit, vm: HomeViewModel = viewModel()) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
@@ -226,6 +227,16 @@ fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, vm: HomeViewMo
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Durazno)
+                    .clickable(onClick = onEscanear),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.QrCodeScanner, "Escanear código QR", tint = Terracota)
+            }
             Box(
                 modifier = Modifier
                     .size(48.dp)
