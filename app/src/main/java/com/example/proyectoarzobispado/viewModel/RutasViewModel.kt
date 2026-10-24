@@ -9,19 +9,33 @@ import com.example.proyectoarzobispado.model.Ruta
 
 class RutasViewModel(app: Application) : AndroidViewModel(app) {
 
-    /** Lista de rutas del usuario (por ahora solo en memoria). */
     var rutas by mutableStateOf<List<Ruta>>(emptyList())
         private set
 
-    /**
-     * Más adelante aquí agregaremos la ruta creada.
-     * Por ahora solo deja el hueco listo.
-     */
+    /** Si no es null, estamos editando esa ruta en CrearRutaScreen. */
+    var rutaEnEdicion by mutableStateOf<Ruta?>(null)
+        private set
+
     fun agregarRuta(ruta: Ruta) {
         rutas = rutas + ruta
+        rutaEnEdicion = null
+    }
+
+    fun actualizarRuta(ruta: Ruta) {
+        rutas = rutas.map { if (it.id == ruta.id) ruta else it }
+        rutaEnEdicion = null
     }
 
     fun eliminarRuta(id: Long) {
         rutas = rutas.filter { it.id != id }
+        if (rutaEnEdicion?.id == id) rutaEnEdicion = null
+    }
+
+    fun empezarEdicion(ruta: Ruta) {
+        rutaEnEdicion = ruta
+    }
+
+    fun cancelarEdicion() {
+        rutaEnEdicion = null
     }
 }

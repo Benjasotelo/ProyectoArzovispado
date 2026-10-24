@@ -94,13 +94,28 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
             ) {
                 FichaScreen(onVolver = { tabNav.popBackStack() })
             }
-            composable(Routes.TAB_RUTAS) {
+            composable(Routes.TAB_RUTAS) { backStackEntry ->
+                val rutasVm: RutasViewModel = viewModel(backStackEntry)
                 RutasScreen(
-                    onCrearRuta = { tabNav.navigate(Routes.CREAR_RUTA) },
+                    vm = rutasVm,
+                    onCrearRuta = {
+                        rutasVm.cancelarEdicion()
+                        tabNav.navigate(Routes.CREAR_RUTA)
+                    },
                     onVerEnMapa = { ruta ->
                         homeVm.mostrarRuta(ruta)
                         irA(Routes.TAB_MAPA)
+                    },
+                    onEditarRuta = { ruta ->
+                        rutasVm.empezarEdicion(ruta)
+                        tabNav.navigate(Routes.CREAR_RUTA)
+                    },
+                    onRutaEliminada = { id ->
+                        if (homeVm.rutaEnMapa?.id == id) {
+                            homeVm.limpiarRuta()
+                        }
                     }
+                
                 )
             }
             composable(Routes.CREAR_RUTA) { backStackEntry ->
@@ -108,11 +123,18 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
                     tabNav.getBackStackEntry(Routes.TAB_RUTAS)
                 }
                 val rutasVm: RutasViewModel = viewModel(parentEntry)
-
                 CrearRutaScreen(
-                    onVolver = { tabNav.popBackStack() },
+                    rutaInicial = rutasVm.rutaEnEdicion,
+                    onVolver = {
+                        rutasVm.cancelarEdicion()
+                        tabNav.popBackStack()
+                    },
                     onGuardar = { ruta ->
-                        rutasVm.agregarRuta(ruta)
+                        if (rutasVm.rutaEnEdicion != null) {
+                            rutasVm.actualizarRuta(ruta)
+                        } else {
+                            rutasVm.agregarRuta(ruta)
+                        }
                         tabNav.popBackStack()
                     }
                 )

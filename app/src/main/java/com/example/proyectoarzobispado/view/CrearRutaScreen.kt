@@ -47,8 +47,16 @@ import com.example.proyectoarzobispado.viewmodel.CrearRutaViewModel
 fun CrearRutaScreen(
     onVolver: () -> Unit,
     onGuardar: (Ruta) -> Unit,
+    rutaInicial: Ruta? = null,
     vm: CrearRutaViewModel = viewModel()
 ) {
+    // Carga la ruta una sola vez al entrar en modo edición
+    androidx.compose.runtime.LaunchedEffect(rutaInicial?.id) {
+        if (rutaInicial != null) {
+            vm.cargarParaEditar(rutaInicial)
+        }
+    }
+
     val puedeGuardar = vm.idsSeleccionados.size >= 2
 
     Column(
@@ -69,7 +77,7 @@ fun CrearRutaScreen(
                 )
             }
             Text(
-                "Crear ruta",
+                if (vm.esEdicion) "Editar ruta" else "Crear ruta",
                 style = MaterialTheme.typography.titleMedium,
                 color = TextoOscuro
             )
@@ -130,8 +138,11 @@ fun CrearRutaScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             Text(
-                if (puedeGuardar) "Guardar ruta (${vm.idsSeleccionados.size} paradas)"
-                else "Elige al menos 2 recintos"
+                when {
+                    !puedeGuardar -> "Elige al menos 2 recintos"
+                    vm.esEdicion -> "Guardar cambios"
+                    else -> "Guardar ruta (${vm.idsSeleccionados.size} paradas)"
+                }
             )
         }
     }

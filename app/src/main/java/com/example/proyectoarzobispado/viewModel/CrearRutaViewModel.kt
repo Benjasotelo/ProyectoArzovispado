@@ -20,12 +20,17 @@ class CrearRutaViewModel(app: Application) : AndroidViewModel(app) {
     var recintos by mutableStateOf<List<Recinto>>(emptyList())
         private set
 
-    /** IDs de los recintos elegidos, en el orden en que el usuario los tocó. */
     var idsSeleccionados by mutableStateOf<List<Int>>(emptyList())
         private set
 
     var nombre by mutableStateOf("")
         private set
+
+    /** Id de la ruta si estamos editando; null si es nueva. */
+    private var idRutaExistente: Long? = null
+
+    val esEdicion: Boolean
+        get() = idRutaExistente != null
 
     init {
         viewModelScope.launch {
@@ -35,11 +40,17 @@ class CrearRutaViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Llamar al abrir la pantalla si venimos de "editar". */
+    fun cargarParaEditar(ruta: Ruta) {
+        idRutaExistente = ruta.id
+        nombre = ruta.nombre
+        idsSeleccionados = ruta.paradas.sortedBy { it.orden }.map { it.recintoId }
+    }
+
     fun actualizarNombre(texto: String) {
         nombre = texto
     }
 
-    /** Si ya está seleccionado, lo quita. Si no, lo agrega al final. */
     fun alternarRecinto(id: Int) {
         idsSeleccionados = if (id in idsSeleccionados) {
             idsSeleccionados - id
@@ -50,10 +61,6 @@ class CrearRutaViewModel(app: Application) : AndroidViewModel(app) {
 
     fun estaSeleccionado(id: Int): Boolean = id in idsSeleccionados
 
-    /**
-     * Calcula minutos caminando entre dos recintos.
-     * Misma lógica del mapa: ~5 km/h ≈ 83 metros por minuto.
-     */
     private fun minutosEntre(a: Recinto, b: Recinto): Int {
         val resultado = FloatArray(1)
         Location.distanceBetween(
@@ -64,10 +71,6 @@ class CrearRutaViewModel(app: Application) : AndroidViewModel(app) {
         return (resultado[0] / 83f).toInt().coerceAtLeast(1)
     }
 
-    /**
-     * Arma la Ruta a partir de la selección actual.
-     * Devuelve null si faltan datos (menos de 2 paradas o nombre vacío).
-     */
     fun construirRuta(): Ruta? {
         if (idsSeleccionados.size < 2) return null
         val nombreFinal = nombre.trim().ifBlank { "Mi ruta" }
@@ -94,7 +97,7 @@ class CrearRutaViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         return Ruta(
-            id = System.currentTimeMillis(), // id temporal único en memoria
+            id = idRutaExistente ?: System.currentTimeMillis(),
             nombre = nombreFinal,
             paradas = paradas,
             tiempoTotalMinutos = tiempoTotal
