@@ -1,6 +1,7 @@
 package com.example.proyectoarzobispado.viewmodel
 
 import android.app.Application
+import com.example.proyectoarzobispado.model.Ruta
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,6 +19,7 @@ private fun normalizar(texto: String): String =
         .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
 
 class HomeViewModel(app: Application) : AndroidViewModel(app) {
+
     private val repo = Repositorio.obtener(app)
 
     private var recintos by mutableStateOf<List<Recinto>>(emptyList())
@@ -30,6 +32,17 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var consulta by mutableStateOf("")
         private set
+
+    /** Ruta que se está mostrando en el mapa (null = ninguna). */
+    var rutaEnMapa by mutableStateOf<Ruta?>(null)
+        private set
+
+    /** Recintos de la ruta, en orden de las paradas. */
+    val puntosRuta: List<Recinto>
+        get() = rutaEnMapa?.paradas
+            ?.sortedBy { it.orden }
+            ?.mapNotNull { parada -> recintos.find { it.id == parada.recintoId } }
+            ?: emptyList()
 
     val recintosFiltrados: List<Recinto>
         get() = filtroEstado?.let { f -> recintos.filter { it.estado == f } } ?: recintos
@@ -79,5 +92,16 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         consulta = ""
         if (filtroEstado != null && recinto.estado != filtroEstado) filtroEstado = null
         recintoSeleccionado = recinto
+    }
+
+    fun mostrarRuta(ruta: Ruta) {
+        rutaEnMapa = ruta
+        filtroEstado = null
+        recintoSeleccionado = null
+        consulta = ""
+    }
+
+    fun limpiarRuta() {
+        rutaEnMapa = null
     }
 }

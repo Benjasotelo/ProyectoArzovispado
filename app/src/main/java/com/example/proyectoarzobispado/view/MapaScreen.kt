@@ -8,6 +8,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.Polyline
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -154,6 +156,19 @@ fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, onEscanear: ()
         }
     }
 
+    // Cuando hay una ruta activa, encuadra todas sus paradas en el mapa
+    LaunchedEffect(vm.rutaEnMapa?.id) {
+        val puntos = vm.puntosRuta
+        if (puntos.size >= 2) {
+            val bounds = LatLngBounds.builder().apply {
+                puntos.forEach { include(LatLng(it.latitud, it.longitud)) }
+            }.build()
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngBounds(bounds, 150)
+            )
+        }
+    }
+
     Box(Modifier.fillMaxSize()) {
 
         GoogleMap(
@@ -177,6 +192,15 @@ fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, onEscanear: ()
                         onClick = { vm.seleccionarRecinto(r); true }
                     )
                 }
+            }
+            // Trazado de la ruta activa (CU-08)
+            val puntos = vm.puntosRuta
+            if (puntos.size >= 2) {
+                Polyline(
+                    points = puntos.map { LatLng(it.latitud, it.longitud) },
+                    color = Terracota,
+                    width = 14f
+                )
             }
         }
 

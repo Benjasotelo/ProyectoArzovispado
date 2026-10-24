@@ -1,5 +1,6 @@
 package com.example.proyectoarzobispado.view
 
+import com.example.proyectoarzobispado.viewmodel.RutasViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.compose.foundation.BorderStroke
@@ -39,6 +40,7 @@ import com.example.proyectoarzobispado.ui.theme.Crema
 import com.example.proyectoarzobispado.ui.theme.Durazno
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
+import com.example.proyectoarzobispado.viewmodel.HomeViewModel
 import com.example.proyectoarzobispado.viewmodel.PerfilViewModel
 
 private data class TabItem(val route: String, val label: String, val icon: ImageVector)
@@ -56,6 +58,7 @@ private fun pestanasPara(rol: Rol?): List<TabItem> = buildList {
 
 @Composable
 fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel()) {
+    val homeVm: HomeViewModel = viewModel()
     val tabNav = rememberNavController()
     val backStack by tabNav.currentBackStackEntryAsState()
     val rutaActual = backStack?.destination?.route
@@ -80,7 +83,9 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
                 MapaScreen(
                     onPerfil = { irA(Routes.TAB_PERFIL) },
                     onAbrirFicha = { id -> tabNav.navigate(Routes.ficha(id)) },
-                    onEscanear = { tabNav.navigate(Routes.ESCANER) }
+                    onEscanear = { tabNav.navigate(Routes.ESCANER) },
+                    vm = homeVm
+
                 )
             }
             composable(
@@ -89,7 +94,29 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
             ) {
                 FichaScreen(onVolver = { tabNav.popBackStack() })
             }
-            composable(Routes.TAB_RUTAS) { PlaceholderTab("Rutas patrimoniales") }
+            composable(Routes.TAB_RUTAS) {
+                RutasScreen(
+                    onCrearRuta = { tabNav.navigate(Routes.CREAR_RUTA) },
+                    onVerEnMapa = { ruta ->
+                        homeVm.mostrarRuta(ruta)
+                        irA(Routes.TAB_MAPA)
+                    }
+                )
+            }
+            composable(Routes.CREAR_RUTA) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    tabNav.getBackStackEntry(Routes.TAB_RUTAS)
+                }
+                val rutasVm: RutasViewModel = viewModel(parentEntry)
+
+                CrearRutaScreen(
+                    onVolver = { tabNav.popBackStack() },
+                    onGuardar = { ruta ->
+                        rutasVm.agregarRuta(ruta)
+                        tabNav.popBackStack()
+                    }
+                )
+            }
             composable(Routes.TAB_AVISOS) { PlaceholderTab("Avisos") }
             composable(Routes.TAB_MI_RECINTO) { MiRecintoScreen() }
             composable(Routes.TAB_PERFIL) { PerfilScreen(onCerrarSesion) }
