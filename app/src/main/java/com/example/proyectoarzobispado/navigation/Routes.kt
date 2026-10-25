@@ -15,7 +15,7 @@ object Routes {
     // Ficha patrimonial: {recintoId} es un parámetro que se rellena al navegar
     const val FICHA = "ficha/{recintoId}"
     fun ficha(recintoId: Int) = "ficha/$recintoId"
-
     // Crear ruta (dentro del tab de Rutas)
     const val CREAR_RUTA = "crear_ruta"
+    const val FAVORITOS = "favoritos"
 }

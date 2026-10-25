@@ -8,6 +8,10 @@ import com.example.proyectoarzobispado.model.Rol
 import com.example.proyectoarzobispado.model.Usuario
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import androidx.room.withTransaction
+import com.example.proyectoarzobispado.model.Ruta
+import kotlinx.coroutines.flow.combine
+import com.example.proyectoarzobispado.model.Aviso
 
 class Repositorio private constructor(context: Context) {
 
@@ -23,6 +27,62 @@ class Repositorio private constructor(context: Context) {
     fun recinto(id: Int): Flow<Recinto?> =
         recintos.map { lista -> lista.find { it.id == id } }
 
+    // ---------- Rutas ----------
+    val rutas: Flow<List<Ruta>> =
+        db.rutaDao().observarTodas().map { lista -> lista.map { it.aModelo() } }
+
+    // Sirve para crear y para editar (mismo id = reemplaza)
+    suspend fun guardarRuta(ruta: Ruta) {
+        db.withTransaction {
+            val dao = db.rutaDao()
+            dao.borrarParadas(ruta.id)
+            dao.guardarRuta(RutaEntity(ruta.id, ruta.nombre, ruta.tiempoTotalMinutos))
+            dao.insertarParadas(ruta.paradas.map {
+                ParadaEntity(
+                    rutaId = ruta.id,
+                    recintoId = it.recintoId,
+                    orden = it.orden,
+                    tiempoEstimadoMinutos = it.tiempoEstimadoMinutos
+                )
+            })
+        }
+    }
+
+    // ---------- Favoritos (por usuario; el invitado usa el id -1) ----------
+    fun idsFavoritos(): Flow<List<Int>> =
+        db.favoritoDao().observarIds(sesion.usuarioId())
+
+    // Une la lista de recintos con los ids guardados y se queda con los favoritos
+    fun favoritos(): Flow<List<Recinto>> =
+        combine(recintos, idsFavoritos()) { lista, ids -> lista.filter { it.id in ids } }
+
+    suspend fun alternarFavorito(recintoId: Int, esFavoritoAhora: Boolean) {
+        val usuarioId = sesion.usuarioId()
+        if (esFavoritoAhora) db.favoritoDao().quitar(usuarioId, recintoId)
+        else db.favoritoDao().agregar(FavoritoEntity(usuarioId, recintoId))
+    }
+
+    suspend fun eliminarRuta(id: Long) = db.rutaDao().eliminar(id)
+
+    // ---------- Avisos ----------
+    val avisos: Flow<List<Aviso>> =
+        db.avisoDao().observarTodos().map { lista -> lista.map { it.aModelo() } }
+
+    fun avisosDe(recintoId: Int): Flow<List<Aviso>> =
+        avisos.map { lista -> lista.filter { it.recintoId == recintoId } }
+
+    suspend fun publicarAviso(recintoId: Int, titulo: String, mensaje: String) {
+        db.avisoDao().insertar(
+            AvisoEntity(
+                recintoId = recintoId,
+                titulo = titulo.trim(),
+                mensaje = mensaje.trim(),
+                fecha = System.currentTimeMillis()
+            )
+        )
+    }
+
+    suspend fun eliminarAviso(id: Long) = db.avisoDao().eliminar(id)
     // ---------- Datos iniciales (se ejecuta al abrir la app) ----------
     suspend fun sembrarDatosIniciales() {
         // IGNORE: solo inserta los recintos que aún no existen
@@ -32,6 +92,18 @@ class Repositorio private constructor(context: Context) {
             crearUsuario("Juan Pérez", "juanperez@duocuc.cl", "123456", Rol.TURISTA)
             crearUsuario("Colegio Demo", "colegio@demo.cl", "123456", Rol.COLEGIO)
             crearUsuario("Encargado Demo", "encargado@demo.cl", "123456", Rol.ENCARGADO)
+        }
+
+        if (db.avisoDao().contar() == 0) {
+            val ahora = System.currentTimeMillis()
+            val hora = 3_600_000L
+            val dao = db.avisoDao()
+            dao.insertar(AvisoEntity(recintoId = 1, titulo = "Misa solemne este domingo",
+                mensaje = "La Catedral estará cerrada a visitas entre las 11:00 y las 13:00.", fecha = ahora - 2 * hora))
+            dao.insertar(AvisoEntity(recintoId = 2, titulo = "Visitas guiadas gratuitas",
+                mensaje = "Este sábado a las 16:00 hay recorrido guiado por el claustro.", fecha = ahora - 26 * hora))
+            dao.insertar(AvisoEntity(recintoId = 5, titulo = "Horario especial",
+                mensaje = "La Basílica abrirá hasta las 20:00 durante esta semana.", fecha = ahora - 50 * hora))
         }
     }
 

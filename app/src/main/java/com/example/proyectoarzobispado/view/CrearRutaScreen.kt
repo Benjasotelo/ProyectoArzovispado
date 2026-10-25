@@ -42,6 +42,7 @@ import com.example.proyectoarzobispado.ui.theme.Durazno
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
 import com.example.proyectoarzobispado.viewmodel.CrearRutaViewModel
+import androidx.compose.foundation.layout.navigationBarsPadding
 
 @Composable
 fun CrearRutaScreen(
@@ -108,7 +109,7 @@ fun CrearRutaScreen(
                 start = 20.dp,
                 end = 20.dp,
                 top = 8.dp,
-                bottom = 100.dp
+                bottom = 16.dp
             ),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.weight(1f)
@@ -135,6 +136,7 @@ fun CrearRutaScreen(
             colors = ButtonDefaults.buttonColors(containerColor = Terracota),
             modifier = Modifier
                 .fillMaxWidth()
+                .navigationBarsPadding()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             Text(

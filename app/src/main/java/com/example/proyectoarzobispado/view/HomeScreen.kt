@@ -115,7 +115,7 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
                             homeVm.limpiarRuta()
                         }
                     }
-                
+
                 )
             }
             composable(Routes.CREAR_RUTA) { backStackEntry ->
@@ -139,9 +139,17 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
                     }
                 )
             }
-            composable(Routes.TAB_AVISOS) { PlaceholderTab("Avisos") }
+            composable(Routes.TAB_AVISOS) { AvisosScreen() }
             composable(Routes.TAB_MI_RECINTO) { MiRecintoScreen() }
-            composable(Routes.TAB_PERFIL) { PerfilScreen(onCerrarSesion) }
+            composable(Routes.FAVORITOS) {
+                FavoritosScreen(
+                    onVolver = { tabNav.popBackStack() },
+                    onAbrirFicha = { id -> tabNav.navigate(Routes.ficha(id)) }
+                )
+            }
+            composable(Routes.TAB_PERFIL) {
+                PerfilScreen(onCerrarSesion, onFavoritos = { tabNav.navigate(Routes.FAVORITOS) })
+            }
             composable(Routes.ESCANER) {
                 EscanerScreen(
                     onVolver = { tabNav.popBackStack() },
@@ -155,12 +163,18 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
             }
         }
 
-        BarraFlotante(
-            tabs = tabs,
-            rutaActual = if (rutaActual == Routes.FICHA || rutaActual == Routes.ESCANER) Routes.TAB_MAPA else rutaActual,
-            onTabClick = irA,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+        if (rutaActual != Routes.CREAR_RUTA) {
+            BarraFlotante(
+                tabs = tabs,
+                rutaActual = when (rutaActual) {
+                    Routes.FICHA, Routes.ESCANER -> Routes.TAB_MAPA
+                    Routes.FAVORITOS -> Routes.TAB_PERFIL
+                    else -> rutaActual
+                },
+                onTabClick = irA,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 

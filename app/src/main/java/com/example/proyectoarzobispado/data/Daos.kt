@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import androidx.room.Transaction
 
 @Dao
 interface UsuarioDao {
@@ -33,4 +34,51 @@ interface RecintoDao {
     // Para que el Encargado cambie el estado (CU-18)
     @Query("UPDATE recintos SET estado = :estado WHERE id = :id")
     suspend fun actualizarEstado(id: Int, estado: String)
+}
+
+@Dao
+interface RutaDao {
+    @Transaction
+    @Query("SELECT * FROM rutas ORDER BY id DESC")
+    fun observarTodas(): Flow<List<RutaConParadas>>
+
+    // REPLACE: si el id ya existe (edición), reemplaza la ruta
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun guardarRuta(ruta: RutaEntity)
+
+    @Insert
+    suspend fun insertarParadas(paradas: List<ParadaEntity>)
+
+    @Query("DELETE FROM paradas_ruta WHERE rutaId = :rutaId")
+    suspend fun borrarParadas(rutaId: Long)
+
+    @Query("DELETE FROM rutas WHERE id = :id")
+    suspend fun eliminar(id: Long)
+}
+
+@Dao
+interface FavoritoDao {
+    @Query("SELECT recintoId FROM favoritos WHERE usuarioId = :usuarioId")
+    fun observarIds(usuarioId: Long): Flow<List<Int>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun agregar(favorito: FavoritoEntity)
+
+    @Query("DELETE FROM favoritos WHERE usuarioId = :usuarioId AND recintoId = :recintoId")
+    suspend fun quitar(usuarioId: Long, recintoId: Int)
+}
+
+@Dao
+interface AvisoDao {
+    @Query("SELECT * FROM avisos ORDER BY fecha DESC")
+    fun observarTodos(): Flow<List<AvisoEntity>>
+
+    @Insert
+    suspend fun insertar(aviso: AvisoEntity)
+
+    @Query("DELETE FROM avisos WHERE id = :id")
+    suspend fun eliminar(id: Long)
+
+    @Query("SELECT COUNT(*) FROM avisos")
+    suspend fun contar(): Int
 }

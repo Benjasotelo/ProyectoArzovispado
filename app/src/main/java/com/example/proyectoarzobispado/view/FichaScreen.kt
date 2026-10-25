@@ -35,6 +35,8 @@ import com.example.proyectoarzobispado.ui.theme.BordeSuave
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
 import com.example.proyectoarzobispado.viewmodel.FichaViewModel
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 
 @Composable
 fun FichaScreen(onVolver: () -> Unit, vm: FichaViewModel = viewModel()) {
@@ -64,6 +66,23 @@ fun FichaScreen(onVolver: () -> Unit, vm: FichaViewModel = viewModel()) {
                 style = MaterialTheme.typography.titleMedium,
                 color = TextoOscuro
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),          // <- agregar esta línea
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                IconButton(onClick = onVolver) { /* igual que antes */ }
+                Text("Ficha patrimonial", /* igual que antes */)
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = { vm.alternarFavorito() }) {
+                    Icon(
+                        imageVector = if (vm.esFavorito) Icons.Filled.Favorite
+                        else Icons.Filled.FavoriteBorder,
+                        contentDescription = if (vm.esFavorito) "Quitar de favoritos" else "Guardar en favoritos",
+                        tint = Terracota
+                    )
+                }
+            }
         }
 
         if (recinto == null) {
@@ -115,8 +134,11 @@ fun FichaScreen(onVolver: () -> Unit, vm: FichaViewModel = viewModel()) {
             SeccionFicha("Horarios", "Aún sin información.")
             SeccionFicha("Eventos", "Aún sin información.")
             SeccionFicha("Galería de imágenes", "Aún sin información.")
-            SeccionFicha("Avisos", "Aún sin información.")
-        }
+            SeccionFicha(
+                "Avisos",
+                if (vm.avisos.isEmpty()) "Sin avisos por ahora."
+                else vm.avisos.joinToString("\n\n") { "• ${it.titulo}: ${it.mensaje}" }
+            )        }
 
         // espacio para que la barra flotante no tape el contenido
         Spacer(Modifier.height(110.dp))

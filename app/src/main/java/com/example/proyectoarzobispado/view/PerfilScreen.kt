@@ -22,9 +22,11 @@ import com.example.proyectoarzobispado.ui.theme.Durazno
 import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
 import com.example.proyectoarzobispado.viewmodel.PerfilViewModel
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Favorite
 
 @Composable
-fun PerfilScreen(onCerrarSesion: () -> Unit, vm: PerfilViewModel = viewModel()) {
+fun PerfilScreen(onCerrarSesion: () -> Unit, onFavoritos: () -> Unit, vm: PerfilViewModel = viewModel()) {
     val usuario = vm.usuario
 
     Column(
@@ -70,6 +72,23 @@ fun PerfilScreen(onCerrarSesion: () -> Unit, vm: PerfilViewModel = viewModel()) 
                     )
                     usuario?.let { Text(it.rol.etiqueta, fontSize = 12.sp, color = Terracota) }
                 }
+            }
+        }
+        Card(
+            onClick = onFavoritos,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            border = BorderStroke(1.dp, BordeSuave)
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(Icons.Filled.Favorite, null, tint = Terracota)
+                Text("Mis favoritos", modifier = Modifier.weight(1f), color = TextoOscuro)
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TextoOscuro.copy(alpha = 0.5f))
             }
         }
 

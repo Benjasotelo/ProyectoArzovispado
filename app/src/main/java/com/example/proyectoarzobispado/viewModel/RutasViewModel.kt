@@ -5,9 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.proyectoarzobispado.data.Repositorio
 import com.example.proyectoarzobispado.model.Ruta
+import kotlinx.coroutines.launch
 
 class RutasViewModel(app: Application) : AndroidViewModel(app) {
+    private val repo = Repositorio.obtener(app)
 
     var rutas by mutableStateOf<List<Ruta>>(emptyList())
         private set
@@ -16,26 +20,26 @@ class RutasViewModel(app: Application) : AndroidViewModel(app) {
     var rutaEnEdicion by mutableStateOf<Ruta?>(null)
         private set
 
-    fun agregarRuta(ruta: Ruta) {
-        rutas = rutas + ruta
-        rutaEnEdicion = null
+    init {
+        // Cada vez que cambia la tabla, la lista se actualiza sola
+        viewModelScope.launch {
+            repo.rutas.collect { rutas = it }
+        }
     }
 
-    fun actualizarRuta(ruta: Ruta) {
-        rutas = rutas.map { if (it.id == ruta.id) ruta else it }
+    fun agregarRuta(ruta: Ruta) = guardar(ruta)
+    fun actualizarRuta(ruta: Ruta) = guardar(ruta)
+
+    private fun guardar(ruta: Ruta) {
         rutaEnEdicion = null
+        viewModelScope.launch { repo.guardarRuta(ruta) }
     }
 
     fun eliminarRuta(id: Long) {
-        rutas = rutas.filter { it.id != id }
         if (rutaEnEdicion?.id == id) rutaEnEdicion = null
+        viewModelScope.launch { repo.eliminarRuta(id) }
     }
 
-    fun empezarEdicion(ruta: Ruta) {
-        rutaEnEdicion = ruta
-    }
-
-    fun cancelarEdicion() {
-        rutaEnEdicion = null
-    }
+    fun empezarEdicion(ruta: Ruta) { rutaEnEdicion = ruta }
+    fun cancelarEdicion() { rutaEnEdicion = null }
 }
