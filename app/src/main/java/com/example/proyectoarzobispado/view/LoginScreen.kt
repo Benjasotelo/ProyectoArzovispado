@@ -108,7 +108,10 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        TextButton(onClick = { }, modifier = Modifier.align(Alignment.End)) {
+        TextButton(
+            onClick = { navController.navigate(Routes.RECUPERAR) },
+            modifier = Modifier.align(Alignment.End)
+        ) {
             Text("¿Olvidaste tu contraseña?", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Terracota)
         }
         Spacer(Modifier.height(8.dp))

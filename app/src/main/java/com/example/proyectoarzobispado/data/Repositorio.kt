@@ -12,6 +12,9 @@ import androidx.room.withTransaction
 import com.example.proyectoarzobispado.model.Ruta
 import kotlinx.coroutines.flow.combine
 import com.example.proyectoarzobispado.model.Aviso
+import com.example.proyectoarzobispado.model.EstadoVisita
+import com.example.proyectoarzobispado.model.Visita
+
 
 class Repositorio private constructor(context: Context) {
 
@@ -83,6 +86,7 @@ class Repositorio private constructor(context: Context) {
     }
 
     suspend fun eliminarAviso(id: Long) = db.avisoDao().eliminar(id)
+
     // ---------- Datos iniciales (se ejecuta al abrir la app) ----------
     suspend fun sembrarDatosIniciales() {
         // IGNORE: solo inserta los recintos que aún no existen
@@ -106,6 +110,32 @@ class Repositorio private constructor(context: Context) {
                 mensaje = "La Basílica abrirá hasta las 20:00 durante esta semana.", fecha = ahora - 50 * hora))
         }
     }
+
+    // ---------- Visitas del colegio ----------
+    fun visitas(): Flow<List<Visita>> =
+        db.visitaDao().observarDe(sesion.usuarioId()).map { lista -> lista.map { it.aModelo() } }
+
+    suspend fun programarVisita(
+        recintoId: Int, fechaMillis: Long, hora: String,
+        participantes: Int, requiereGuia: Boolean
+    ) {
+        db.visitaDao().insertar(
+            VisitaEntity(
+                usuarioId = sesion.usuarioId(),
+                recintoId = recintoId,
+                fechaMillis = fechaMillis,
+                hora = hora,
+                participantes = participantes,
+                requiereGuia = requiereGuia,
+                estado = EstadoVisita.PENDIENTE.name
+            )
+        )
+    }
+
+    suspend fun confirmarVisita(id: Long) =
+        db.visitaDao().cambiarEstado(id, EstadoVisita.CONFIRMADA.name)
+
+    suspend fun eliminarVisita(id: Long) = db.visitaDao().eliminar(id)
 
     // ---------- Sesión ----------
     fun haySesion(): Boolean = sesion.usuarioId() != -1L
@@ -137,6 +167,14 @@ class Repositorio private constructor(context: Context) {
         if (id == -1L) return "No se pudo crear la cuenta"
         sesion.guardar(id)
         return null
+    }
+
+    /** Devuelve true si la cuenta existía y se cambió la clave. */
+    suspend fun cambiarClave(email: String, nuevaClave: String): Boolean {
+        val usuario = db.usuarioDao().buscarPorEmail(email.trim().lowercase()) ?: return false
+        val salt = Seguridad.generarSalt()   // salt nuevo en cada cambio
+        db.usuarioDao().cambiarClave(usuario.id, salt, Seguridad.hash(nuevaClave, salt))
+        return true
     }
 
     private suspend fun crearUsuario(nombre: String, email: String, clave: String, rol: Rol): Long {

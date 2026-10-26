@@ -21,6 +21,9 @@ interface UsuarioDao {
 
     @Query("SELECT COUNT(*) FROM usuarios")
     suspend fun contar(): Int
+
+    @Query("UPDATE usuarios SET salt = :salt, passwordHash = :hash WHERE id = :id")
+    suspend fun cambiarClave(id: Long, salt: String, hash: String)
 }
 
 @Dao
@@ -81,4 +84,20 @@ interface AvisoDao {
 
     @Query("SELECT COUNT(*) FROM avisos")
     suspend fun contar(): Int
+}
+
+@Dao
+interface VisitaDao {
+    // Cada colegio ve solo sus visitas, ordenadas por fecha
+    @Query("SELECT * FROM visitas WHERE usuarioId = :usuarioId ORDER BY fechaMillis")
+    fun observarDe(usuarioId: Long): Flow<List<VisitaEntity>>
+
+    @Insert
+    suspend fun insertar(visita: VisitaEntity)
+
+    @Query("UPDATE visitas SET estado = :estado WHERE id = :id")
+    suspend fun cambiarEstado(id: Long, estado: String)
+
+    @Query("DELETE FROM visitas WHERE id = :id")
+    suspend fun eliminar(id: Long)
 }

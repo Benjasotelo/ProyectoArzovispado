@@ -13,6 +13,8 @@ import androidx.room.Relation
 import com.example.proyectoarzobispado.model.ParadaRuta
 import com.example.proyectoarzobispado.model.Ruta
 import com.example.proyectoarzobispado.model.Aviso
+import com.example.proyectoarzobispado.model.EstadoVisita
+import com.example.proyectoarzobispado.model.Visita
 
 @Entity(tableName = "usuarios", indices = [Index(value = ["email"], unique = true)])
 data class UsuarioEntity(
@@ -108,3 +110,19 @@ data class AvisoEntity(
 )
 
 fun AvisoEntity.aModelo() = Aviso(id, recintoId, titulo, mensaje, fecha)
+
+@Entity(tableName = "visitas")
+data class VisitaEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val usuarioId: Long,
+    val recintoId: Int,
+    val fechaMillis: Long,
+    val hora: String,
+    val participantes: Int,
+    val requiereGuia: Boolean,
+    val estado: String
+)
+
+fun VisitaEntity.aModelo() = Visita(
+    id, recintoId, fechaMillis, hora, participantes, requiereGuia, EstadoVisita.valueOf(estado)
+)

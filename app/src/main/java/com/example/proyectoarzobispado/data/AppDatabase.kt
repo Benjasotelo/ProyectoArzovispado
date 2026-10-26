@@ -6,8 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [UsuarioEntity::class, RecintoEntity::class, RutaEntity::class,
-        ParadaEntity::class, FavoritoEntity::class, AvisoEntity::class],
+    entities = [UsuarioEntity::class, RecintoEntity::class, RutaEntity::class, ParadaEntity::class, FavoritoEntity::class, AvisoEntity::class, VisitaEntity::class],
     version = 4,
     exportSchema = false
 )
@@ -17,6 +16,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun rutaDao(): RutaDao
     abstract fun favoritoDao(): FavoritoDao
     abstract fun avisoDao(): AvisoDao
+    abstract fun visitaDao(): VisitaDao
     companion object {
         @Volatile private var instancia: AppDatabase? = null
 

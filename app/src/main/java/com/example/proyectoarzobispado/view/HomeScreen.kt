@@ -42,6 +42,7 @@ import com.example.proyectoarzobispado.ui.theme.Terracota
 import com.example.proyectoarzobispado.ui.theme.TextoOscuro
 import com.example.proyectoarzobispado.viewmodel.HomeViewModel
 import com.example.proyectoarzobispado.viewmodel.PerfilViewModel
+import androidx.compose.material.icons.filled.CalendarMonth
 
 private data class TabItem(val route: String, val label: String, val icon: ImageVector)
 
@@ -52,6 +53,9 @@ private fun pestanasPara(rol: Rol?): List<TabItem> = buildList {
     add(TabItem(Routes.TAB_AVISOS, "Avisos", Icons.Filled.Notifications))
     if (rol == Rol.ENCARGADO) {
         add(TabItem(Routes.TAB_MI_RECINTO, "Mi recinto", Icons.Filled.AccountBalance))
+    }
+    if (rol == Rol.COLEGIO) {
+        add(TabItem(Routes.TAB_VISITAS, "Visitas", Icons.Filled.CalendarMonth))
     }
     add(TabItem(Routes.TAB_PERFIL, "Perfil", Icons.Filled.Person))
 }
@@ -161,9 +165,15 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
                     }
                 )
             }
+            composable(Routes.TAB_VISITAS) {
+                VisitasScreen(onPlanificar = { tabNav.navigate(Routes.PLANIFICAR_VISITA) })
+            }
+            composable(Routes.PLANIFICAR_VISITA) {
+                PlanificarVisitaScreen(onVolver = { tabNav.popBackStack() })
+            }
         }
 
-        if (rutaActual != Routes.CREAR_RUTA) {
+        if (rutaActual != Routes.CREAR_RUTA && rutaActual != Routes.PLANIFICAR_VISITA) {
             BarraFlotante(
                 tabs = tabs,
                 rutaActual = when (rutaActual) {
@@ -177,7 +187,6 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
         }
     }
 }
-
 @Composable
 private fun BarraFlotante(
     tabs: List<TabItem>,

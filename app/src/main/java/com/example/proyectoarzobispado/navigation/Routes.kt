@@ -11,6 +11,8 @@ object Routes {
     const val TAB_AVISOS = "tab_avisos"
     const val TAB_MI_RECINTO = "tab_mi_recinto"
     const val TAB_PERFIL = "tab_perfil"
+    const val TAB_VISITAS = "tab_visitas"
+    const val PLANIFICAR_VISITA = "planificar_visita"
     const val ESCANER = "escaner"
     // Ficha patrimonial: {recintoId} es un parámetro que se rellena al navegar
     const val FICHA = "ficha/{recintoId}"
@@ -18,4 +20,5 @@ object Routes {
     // Crear ruta (dentro del tab de Rutas)
     const val CREAR_RUTA = "crear_ruta"
     const val FAVORITOS = "favoritos"
+    const val RECUPERAR = "recuperar"
 }

@@ -11,6 +11,7 @@ import com.example.proyectoarzobispado.data.Repositorio
 import com.example.proyectoarzobispado.view.HomeScreen
 import com.example.proyectoarzobispado.view.LoginScreen
 import com.example.proyectoarzobispado.view.RegistroScreen
+import com.example.proyectoarzobispado.view.RecuperarScreen
 
 @Composable
 fun AppNavigation() {
@@ -46,6 +47,9 @@ fun AppNavigation() {
                     }
                 }
             )
+        }
+        composable(Routes.RECUPERAR) {
+            RecuperarScreen(onVolver = { navController.popBackStack() })
         }
     }
 }
