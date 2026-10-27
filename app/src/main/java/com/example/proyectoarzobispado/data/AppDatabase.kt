@@ -15,9 +15,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ParadaEntity::class,
         FavoritoEntity::class,
         AvisoEntity::class,
-        VisitaEntity::class
+        VisitaEntity::class,
+        EventoEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -27,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun favoritoDao(): FavoritoDao
     abstract fun avisoDao(): AvisoDao
     abstract fun visitaDao(): VisitaDao
+    abstract fun eventoDao(): EventoDao
 
     companion object {
         @Volatile
@@ -39,6 +41,21 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Versión 7 agrega la tabla de eventos. */
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS eventos (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            "recintoId INTEGER NOT NULL, " +
+                            "titulo TEXT NOT NULL, " +
+                            "descripcion TEXT NOT NULL, " +
+                            "fecha TEXT NOT NULL, " +
+                            "hora TEXT NOT NULL)"
+                )
+            }
+        }
+
         fun obtener(context: Context): AppDatabase =
             instancia ?: synchronized(this) {
                 instancia ?: Room.databaseBuilder(
@@ -46,7 +63,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "red_patrimonial.db"
                 )
-                    .addMigrations(MIGRATION_4_6)
+                    .addMigrations(MIGRATION_4_6, MIGRATION_6_7)
                     .build()
                     .also { instancia = it }
             }

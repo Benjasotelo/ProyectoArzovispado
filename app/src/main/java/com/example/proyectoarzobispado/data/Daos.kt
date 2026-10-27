@@ -101,3 +101,26 @@ interface VisitaDao {
     @Query("DELETE FROM visitas WHERE id = :id")
     suspend fun eliminar(id: Long)
 }
+
+@Dao
+interface EventoDao {
+    // Eventos de un recinto, para la ficha
+    @Query("SELECT * FROM eventos WHERE recintoId = :recintoId ORDER BY id")
+    fun observarDe(recintoId: Int): Flow<List<EventoEntity>>
+
+    // Todos los eventos, para "Mi recinto" del Encargado
+    @Query("SELECT * FROM eventos ORDER BY id")
+    fun observarTodos(): Flow<List<EventoEntity>>
+
+    @Insert
+    suspend fun insertar(evento: EventoEntity)
+
+    @Insert
+    suspend fun insertarTodos(lista: List<EventoEntity>)
+
+    @Query("DELETE FROM eventos WHERE id = :id")
+    suspend fun eliminar(id: Long)
+
+    @Query("SELECT COUNT(*) FROM eventos")
+    suspend fun contar(): Int
+}
