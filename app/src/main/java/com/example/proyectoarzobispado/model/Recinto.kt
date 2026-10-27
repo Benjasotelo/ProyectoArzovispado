@@ -14,7 +14,8 @@ data class Recinto(
     val longitud: Double,
     val descripcionHistorica: String,
     val tipoRecinto: String,
-    val estado: EstadoRecinto
+    val estado: EstadoRecinto,
+    val horario: String = ""
 )
 
 object RecintosEjemplo {

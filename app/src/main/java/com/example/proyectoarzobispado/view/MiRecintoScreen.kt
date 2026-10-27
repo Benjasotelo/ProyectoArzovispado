@@ -1,5 +1,7 @@
 package com.example.proyectoarzobispado.view
 
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -133,6 +135,138 @@ fun MiRecintoScreen(vm: MiRecintoViewModel = viewModel()) {
                 fontSize = 13.sp,
                 color = TextoOscuro.copy(alpha = 0.7f)
             )
+        }
+
+        if (seleccionado != null) {
+            // ---- Ficha del recinto (edición del Encargado) ----
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = BorderStroke(1.dp, BordeSuave)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        "Ficha del recinto",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Terracota
+                    )
+
+                    if (!vm.modoEdicion) {
+                        // Vista de solo lectura
+                        Text(
+                            seleccionado.nombreOficial,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextoOscuro
+                        )
+                        Text(
+                            seleccionado.direccion,
+                            fontSize = 13.sp,
+                            color = TextoOscuro.copy(alpha = 0.7f)
+                        )
+                        Text(
+                            seleccionado.tipoRecinto,
+                            fontSize = 13.sp,
+                            color = TextoOscuro.copy(alpha = 0.7f)
+                        )
+                        Text(
+                            seleccionado.descripcionHistorica,
+                            fontSize = 13.sp,
+                            color = TextoOscuro.copy(alpha = 0.8f)
+                        )
+                        Text(
+                            if (seleccionado.horario.isBlank()) "Sin horario registrado"
+                            else "Horario: ${seleccionado.horario}",
+                            fontSize = 13.sp,
+                            color = TextoOscuro.copy(alpha = 0.7f)
+                        )
+                        FilledTonalButton(
+                            onClick = { vm.abrirEdicion() },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = Durazno,
+                                contentColor = Terracota
+                            )
+                        ) {
+                            Icon(Icons.Filled.Edit, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Editar ficha")
+                        }
+                    } else {
+                        // Formulario de edición
+                        OutlinedTextField(
+                            value = vm.nombreEdit,
+                            onValueChange = { vm.onNombreChange(it) },
+                            label = { Text("Nombre oficial") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = vm.direccionEdit,
+                            onValueChange = { vm.onDireccionChange(it) },
+                            label = { Text("Dirección") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = vm.tipoEdit,
+                            onValueChange = { vm.onTipoChange(it) },
+                            label = { Text("Tipo de recinto") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = vm.descripcionEdit,
+                            onValueChange = { vm.onDescripcionChange(it) },
+                            label = { Text("Descripción histórica") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2
+                        )
+                        OutlinedTextField(
+                            value = vm.horarioEdit,
+                            onValueChange = { vm.onHorarioChange(it) },
+                            label = { Text("Horario") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            FilledTonalButton(
+                                onClick = { vm.guardarFicha() },
+                                enabled = vm.nombreEdit.isNotBlank() && vm.direccionEdit.isNotBlank(),
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = Durazno,
+                                    contentColor = Terracota
+                                )
+                            ) {
+                                Text("Guardar")
+                            }
+                            OutlinedButton(
+                                onClick = { vm.cancelarEdicion() },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Cancelar")
+                            }
+                        }
+                    }
+
+                    // Mensaje de éxito o error
+                    vm.mensaje?.let { msg ->
+                        Text(
+                            msg,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            // si seguimos en modo edición, el mensaje es un error;
+                            // si ya salimos del modo edición, es de éxito
+                            color = if (vm.modoEdicion) Terracota else TextoOscuro
+                        )
+                    }
+                }
+            }
         }
 
         if (seleccionado != null) {

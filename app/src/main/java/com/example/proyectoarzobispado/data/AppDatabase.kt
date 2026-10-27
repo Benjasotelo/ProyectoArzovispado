@@ -18,7 +18,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         VisitaEntity::class,
         EventoEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -56,6 +56,15 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Versión 8 agrega el horario (texto) a la ficha del recinto. */
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE recintos ADD COLUMN horario TEXT NOT NULL DEFAULT ''"
+                )
+            }
+        }
+
         fun obtener(context: Context): AppDatabase =
             instancia ?: synchronized(this) {
                 instancia ?: Room.databaseBuilder(
@@ -63,7 +72,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "red_patrimonial.db"
                 )
-                    .addMigrations(MIGRATION_4_6, MIGRATION_6_7)
+                    .addMigrations(MIGRATION_4_6, MIGRATION_6_7, MIGRATION_7_8)
                     .build()
                     .also { instancia = it }
             }

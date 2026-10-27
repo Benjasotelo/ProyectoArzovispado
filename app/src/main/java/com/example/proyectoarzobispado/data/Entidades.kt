@@ -37,19 +37,20 @@ data class RecintoEntity(
     val longitud: Double,
     val descripcionHistorica: String,
     val tipoRecinto: String,
-    val estado: String
+    val estado: String,
+    val horario: String
 )
 
 fun UsuarioEntity.aModelo() = Usuario(id, nombre, email, Rol.valueOf(rol))
 
 fun RecintoEntity.aModelo() = Recinto(
     id, nombreOficial, direccion, latitud, longitud,
-    descripcionHistorica, tipoRecinto, EstadoRecinto.valueOf(estado)
+    descripcionHistorica, tipoRecinto, EstadoRecinto.valueOf(estado), horario
 )
 
 fun Recinto.aEntidad() = RecintoEntity(
     id, nombreOficial, direccion, latitud, longitud,
-    descripcionHistorica, tipoRecinto, estado.name
+    descripcionHistorica, tipoRecinto, estado.name, horario
 )
 
 @Entity(tableName = "rutas")
