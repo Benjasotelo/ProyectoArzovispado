@@ -23,7 +23,7 @@ class RutasViewModel(app: Application) : AndroidViewModel(app) {
     init {
         // Cada vez que cambia la tabla, la lista se actualiza sola
         viewModelScope.launch {
-            repo.rutas.collect { rutas = it }
+            repo.rutas().collect { rutas = it }
         }
     }
 

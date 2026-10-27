@@ -47,8 +47,8 @@ interface RecintoDao {
 @Dao
 interface RutaDao {
     @Transaction
-    @Query("SELECT * FROM rutas ORDER BY id DESC")
-    fun observarTodas(): Flow<List<RutaConParadas>>
+    @Query("SELECT * FROM rutas WHERE usuarioId = :usuarioId ORDER BY id DESC")
+    fun observarDe(usuarioId: Long): Flow<List<RutaConParadas>>
 
     // REPLACE: si el id ya existe (edición), reemplaza la ruta
     @Insert(onConflict = OnConflictStrategy.REPLACE)

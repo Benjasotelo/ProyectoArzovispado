@@ -56,6 +56,7 @@ fun Recinto.aEntidad() = RecintoEntity(
 @Entity(tableName = "rutas")
 data class RutaEntity(
     @PrimaryKey val id: Long,
+    val usuarioId: Long,
     val nombre: String,
     val tiempoTotalMinutos: Int
 )

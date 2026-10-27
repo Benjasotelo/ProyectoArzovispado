@@ -136,6 +136,8 @@ fun HomeScreen(onCerrarSesion: () -> Unit, sesionVm: PerfilViewModel = viewModel
                     onGuardar = { ruta ->
                         if (rutasVm.rutaEnEdicion != null) {
                             rutasVm.actualizarRuta(ruta)
+                            // si esa ruta está dibujada en el mapa, refresca la copia
+                            if (homeVm.rutaEnMapa?.id == ruta.id) homeVm.mostrarRuta(ruta)
                         } else {
                             rutasVm.agregarRuta(ruta)
                         }

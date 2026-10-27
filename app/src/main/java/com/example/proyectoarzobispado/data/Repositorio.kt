@@ -38,15 +38,16 @@ class Repositorio private constructor(context: Context) {
         recintos.map { lista -> lista.find { it.id == id } }
 
     // ---------- Rutas ----------
-    val rutas: Flow<List<Ruta>> =
-        db.rutaDao().observarTodas().map { lista -> lista.map { it.aModelo() } }
+    // Función y no val: así lee el usuario que tiene la sesión en ese momento
+    fun rutas(): Flow<List<Ruta>> =
+        db.rutaDao().observarDe(sesion.usuarioId()).map { lista -> lista.map { it.aModelo() } }
 
     // Sirve para crear y para editar (mismo id = reemplaza)
     suspend fun guardarRuta(ruta: Ruta) {
         db.withTransaction {
             val dao = db.rutaDao()
             dao.borrarParadas(ruta.id)
-            dao.guardarRuta(RutaEntity(ruta.id, ruta.nombre, ruta.tiempoTotalMinutos))
+            dao.guardarRuta(RutaEntity(ruta.id, sesion.usuarioId(), ruta.nombre, ruta.tiempoTotalMinutos))
             dao.insertarParadas(ruta.paradas.map {
                 ParadaEntity(
                     rutaId = ruta.id,

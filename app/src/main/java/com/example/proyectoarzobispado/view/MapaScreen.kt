@@ -157,7 +157,7 @@ fun MapaScreen(onPerfil: () -> Unit, onAbrirFicha: (Int) -> Unit, onEscanear: ()
     }
 
     // Cuando hay una ruta activa, encuadra todas sus paradas en el mapa
-    LaunchedEffect(vm.rutaEnMapa?.id) {
+    LaunchedEffect(vm.rutaEnMapa) {
         val puntos = vm.puntosRuta
         if (puntos.size >= 2) {
             val bounds = LatLngBounds.builder().apply {
