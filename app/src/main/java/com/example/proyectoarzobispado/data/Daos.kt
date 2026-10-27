@@ -1,5 +1,6 @@
 package com.example.proyectoarzobispado.data
 
+import androidx.room.Update
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -37,6 +38,10 @@ interface RecintoDao {
     // Para que el Encargado cambie el estado (CU-18)
     @Query("UPDATE recintos SET estado = :estado WHERE id = :id")
     suspend fun actualizarEstado(id: Int, estado: String)
+
+    // Para que el Encargado edite la ficha
+    @Update
+    suspend fun actualizarFicha(recinto: RecintoEntity)
 }
 
 @Dao
@@ -44,6 +49,9 @@ interface RutaDao {
     @Transaction
     @Query("SELECT * FROM rutas ORDER BY id DESC")
     fun observarTodas(): Flow<List<RutaConParadas>>
+
+    @Update
+    suspend fun actualizarFicha(recinto: RecintoEntity)
 
     // REPLACE: si el id ya existe (edición), reemplaza la ruta
     @Insert(onConflict = OnConflictStrategy.REPLACE)

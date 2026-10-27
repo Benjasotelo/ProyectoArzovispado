@@ -28,6 +28,12 @@ class Repositorio private constructor(context: Context) {
     suspend fun actualizarEstado(idRecinto: Int, estado: EstadoRecinto) {
         db.recintoDao().actualizarEstado(idRecinto, estado.name)
     }
+
+    // Para que el Encargado edite la ficha del recinto
+    suspend fun actualizarFicha(recinto: Recinto) {
+        db.recintoDao().actualizarFicha(recinto.aEntidad())
+    }
+
     fun recinto(id: Int): Flow<Recinto?> =
         recintos.map { lista -> lista.find { it.id == id } }
 

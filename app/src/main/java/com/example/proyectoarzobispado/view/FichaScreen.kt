@@ -135,7 +135,11 @@ fun FichaScreen(onVolver: () -> Unit, vm: FichaViewModel = viewModel()) {
             }
 
             SeccionFicha("Historia y descripción", recinto.descripcionHistorica)
-            SeccionFicha("Horarios", "Aún sin información.")
+            SeccionFicha(
+                "Horarios",
+                if (recinto.horario.isBlank()) "Aún sin información."
+                else recinto.horario
+            )
             SeccionEventos(vm.eventos)
             SeccionGaleria(recinto.id)
             SeccionFicha(
