@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.proyectoarzobispado.data.Repositorio
 import com.example.proyectoarzobispado.model.Recinto
+import com.example.proyectoarzobispado.model.Evento
 import kotlinx.coroutines.launch
 import com.example.proyectoarzobispado.model.Aviso
 
@@ -30,6 +31,9 @@ class FichaViewModel(
     var avisos by mutableStateOf<List<Aviso>>(emptyList())
         private set
 
+    var eventos by mutableStateOf<List<Evento>>(emptyList())
+        private set
+
     fun alternarFavorito() {
         viewModelScope.launch { repo.alternarFavorito(recintoId, esFavorito) }
     }
@@ -43,6 +47,9 @@ class FichaViewModel(
         }
         viewModelScope.launch {
             repo.avisosDe(recintoId).collect { avisos = it }
+        }
+        viewModelScope.launch {
+            repo.eventosDe(recintoId).collect { eventos = it }
         }
     }
 }

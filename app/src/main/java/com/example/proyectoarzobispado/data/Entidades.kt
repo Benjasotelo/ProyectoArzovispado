@@ -15,6 +15,7 @@ import com.example.proyectoarzobispado.model.Ruta
 import com.example.proyectoarzobispado.model.Aviso
 import com.example.proyectoarzobispado.model.EstadoVisita
 import com.example.proyectoarzobispado.model.Visita
+import com.example.proyectoarzobispado.model.Evento
 
 @Entity(tableName = "usuarios", indices = [Index(value = ["email"], unique = true)])
 data class UsuarioEntity(
@@ -126,3 +127,16 @@ data class VisitaEntity(
 fun VisitaEntity.aModelo() = Visita(
     id, recintoId, fechaMillis, hora, participantes, requiereGuia, EstadoVisita.valueOf(estado)
 )
+@Entity(tableName = "eventos")
+data class EventoEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val recintoId: Int,
+    val titulo: String,
+    val descripcion: String,
+    val fecha: String,
+    val hora: String
+)
+
+fun EventoEntity.aModelo() = Evento(id, recintoId, titulo, descripcion, fecha, hora)
+
+fun Evento.aEntidad() = EventoEntity(id, recintoId, titulo, descripcion, fecha, hora)

@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.combine
 import com.example.proyectoarzobispado.model.Aviso
 import com.example.proyectoarzobispado.model.EstadoVisita
 import com.example.proyectoarzobispado.model.Visita
-
+import com.example.proyectoarzobispado.model.Evento
+import com.example.proyectoarzobispado.model.EventosEjemplo
 
 class Repositorio private constructor(context: Context) {
 
@@ -87,6 +88,31 @@ class Repositorio private constructor(context: Context) {
 
     suspend fun eliminarAviso(id: Long) = db.avisoDao().eliminar(id)
 
+    // ---------- Eventos ----------
+    // Todos los eventos (los usa "Mi recinto" del Encargado)
+    val eventos: Flow<List<Evento>> =
+        db.eventoDao().observarTodos().map { lista -> lista.map { it.aModelo() } }
+
+    // Eventos de un solo recinto (los usa la ficha)
+    fun eventosDe(recintoId: Int): Flow<List<Evento>> =
+        db.eventoDao().observarDe(recintoId).map { lista -> lista.map { it.aModelo() } }
+
+    suspend fun agregarEvento(
+        recintoId: Int, titulo: String, descripcion: String, fecha: String, hora: String
+    ) {
+        db.eventoDao().insertar(
+            EventoEntity(
+                recintoId = recintoId,
+                titulo = titulo.trim(),
+                descripcion = descripcion.trim(),
+                fecha = fecha.trim(),
+                hora = hora.trim()
+            )
+        )
+    }
+
+    suspend fun eliminarEvento(id: Long) = db.eventoDao().eliminar(id)
+
     // ---------- Datos iniciales (se ejecuta al abrir la app) ----------
     suspend fun sembrarDatosIniciales() {
         // IGNORE: solo inserta los recintos que aún no existen
@@ -108,6 +134,10 @@ class Repositorio private constructor(context: Context) {
                 mensaje = "Este sábado a las 16:00 hay recorrido guiado por el claustro.", fecha = ahora - 26 * hora))
             dao.insertar(AvisoEntity(recintoId = 5, titulo = "Horario especial",
                 mensaje = "La Basílica abrirá hasta las 20:00 durante esta semana.", fecha = ahora - 50 * hora))
+        }
+
+        if (db.eventoDao().contar() == 0) {
+            db.eventoDao().insertarTodos(EventosEjemplo.lista.map { it.aEntidad() })
         }
     }
 
