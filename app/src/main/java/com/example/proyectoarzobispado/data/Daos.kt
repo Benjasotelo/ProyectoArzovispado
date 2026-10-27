@@ -50,9 +50,6 @@ interface RutaDao {
     @Query("SELECT * FROM rutas ORDER BY id DESC")
     fun observarTodas(): Flow<List<RutaConParadas>>
 
-    @Update
-    suspend fun actualizarFicha(recinto: RecintoEntity)
-
     // REPLACE: si el id ya existe (edición), reemplaza la ruta
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun guardarRuta(ruta: RutaEntity)
